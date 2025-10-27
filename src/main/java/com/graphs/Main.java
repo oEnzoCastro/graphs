@@ -9,11 +9,34 @@ import com.graphs.models.Graph;
 public class Main {
     public static void main(String[] args) {
 
-        Graph graph = readGraph("src/main/java/com/graphs/database/graph-100.txt");
+        // Test sparse graphs
+        System.out.println("=== SPARSE GRAPHS ===");
+        testGraphType("sparse", new int[] { 100, 1000, 10000, 100000 });
 
-        graph.minPath(100, 2);
+        System.out.println("\n");
 
-        System.out.println(graph.toString());
+        // Test dense graphs
+        System.out.println("=== DENSE GRAPHS ===");
+        testGraphType("dense", new int[] { 100, 1000, 10000, 100000 });
+    }
+
+    private static void testGraphType(String graphType, int[] sizes) {
+        for (int size : sizes) {
+            String filePath = "src/main/java/com/graphs/database/" + graphType + "-" + size + ".txt";
+            System.out.println("\nTesting " + graphType + "-" + size + ".txt:");
+
+            double totalTime = 0;
+            for (int i = 1; i <= 3; i++) {
+                long start = System.nanoTime();
+                Graph graph = readGraph(filePath);
+                long end = System.nanoTime();
+                double timeTaken = (end - start) / 1000000.0;
+                totalTime += timeTaken;
+                System.out.println("  Iteration " + i + " - Time: " + String.format("%.4f", timeTaken) + " ms");
+            }
+            double avgTime = totalTime / 3;
+            System.out.println("  Average: " + String.format("%.4f", avgTime) + " ms");
+        }
     }
 
     public static Graph readGraph(String filePath) {
@@ -51,8 +74,5 @@ public class Main {
         return graph;
 
     }
-
-
-
 
 }

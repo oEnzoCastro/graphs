@@ -76,13 +76,101 @@ public class Graph {
         return -1;
     }
 
-    public void minPath(int start, int end) {
+    public ArrayList<Integer> minPath(int start, int end) {
         // Dijkstra's algorithm
 
-        int test = getNode(start);
+        // Check if start and end nodes exist
+        if (getNode(start) == -1 || getNode(end) == -1) {
+            System.out.println("Start or end node does not exist");
+            return new ArrayList<>();
+        }
 
-        System.out.println(test);
+        int n = nodeArray.size();
+        int[] distances = new int[n]; // Distance from start to each node
+        int[] previous = new int[n]; // Previous node in optimal path
+        boolean[] visited = new boolean[n];
 
+        // Initialize distances to infinity (max value) and previous to -1
+        for (int i = 0; i < n; i++) {
+            distances[i] = Integer.MAX_VALUE;
+            previous[i] = -1;
+            visited[i] = false;
+        }
+
+        // Distance from start to itself is 0
+        int startIndex = getNode(start);
+        distances[startIndex] = 0;
+
+        // Main Dijkstra's algorithm loop
+        for (int count = 0; count < n - 1; count++) {
+            // Find the unvisited node with minimum distance
+            int minDistance = Integer.MAX_VALUE;
+            int currentIndex = -1;
+
+            for (int i = 0; i < n; i++) {
+                if (!visited[i] && distances[i] < minDistance) {
+                    minDistance = distances[i];
+                    currentIndex = i;
+                }
+            }
+
+            // If no node was found, break
+            if (currentIndex == -1)
+                break;
+
+            // Mark current node as visited
+            visited[currentIndex] = true;
+
+            // Update distances to neighbors
+            Node currentNode = nodeArray.get(currentIndex);
+            NodeEdge edge = currentNode.edges.head;
+
+            while (edge != null) {
+                int neighborIndex = getNode(edge.value);
+
+                if (neighborIndex != -1 && !visited[neighborIndex]) {
+                    int newDistance = distances[currentIndex] + edge.weight;
+
+                    if (newDistance < distances[neighborIndex]) {
+                        distances[neighborIndex] = newDistance;
+                        previous[neighborIndex] = currentIndex;
+                    }
+                }
+
+                edge = edge.next;
+            }
+        }
+
+        // Build the path from start to end
+        ArrayList<Integer> path = new ArrayList<>();
+        int endIndex = getNode(end);
+
+        // Check if path exists
+        if (distances[endIndex] == Integer.MAX_VALUE) {
+            System.out.println("No path exists from " + start + " to " + end);
+            return path;
+        }
+
+        // Reconstruct path by following previous nodes
+        int current = endIndex;
+        while (current != -1) {
+            path.add(0, nodeArray.get(current).value);
+            current = previous[current];
+        }
+
+        // Print the result
+        // System.out.print("Path: ");
+        // for (int i = 0; i < path.size(); i++) {
+        //     System.out.print(path.get(i));
+        //     if (i < path.size() - 1) {
+        //         System.out.print(" -> ");
+        //     }
+        // }
+
+        // // Print the total weight of the path
+        // System.out.println(" (Peso: " + distances[endIndex] + ")");
+
+        return path;
     }
 
     @Override
